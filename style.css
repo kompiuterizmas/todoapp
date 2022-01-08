@@ -1,0 +1,110 @@
+[data-app='calendar-app'] {
+  margin: 20px;
+}
+
+.calendar-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 800px;
+  margin: 0 auto;
+  min-height: 60px;
+}
+.calendar-nav * {
+  flex: 1 1 200px;
+  text-align: center;
+}
+.calendar-nav button {
+  height: 50px;
+  background: transparent;
+  border: none;
+  color: transparent;
+}
+
+#prev-month::before {
+  content: '<';
+  color: black;
+  font-size: 40px;
+}
+
+#next-month::after {
+  content: '>';
+  color: black;
+  font-size: 40px;
+}
+
+.calendar-grid {
+  display:grid;
+  border: 1px solid black;
+  padding: 10px;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  text-align: center;
+}
+
+.calendar-grid  div {
+  padding: 10px;
+  margin: 0 auto;
+}
+.prev, .next {
+  color: #bbb;
+}
+
+.today {
+  border: 1px solid black;
+  border-radius: 50%;
+  background-color: black;
+  color:white;
+  font-weight:bold;
+}
+
+
+/* body {
+  line-height: 2rem;
+}
+body div {
+  display: flex;
+}
+.row {
+  flex-direction: row;
+}
+.col {
+  flex-direction: column;
+}
+.center {
+  margin: auto;
+}
+.even {
+    justify-content: space-evenly;
+}
+.full {
+  width: 100%;
+}
+.twothird {
+  width: 66%;
+}
+.onethird {
+  width: 33%;
+}
+.border {
+  border-style: solid;
+  border-color: green;
+  border-width: thin;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+table td,
+table th {
+  border: thin solid blue;
+}
+#add {
+    background-color: rgba(0, 255, 0, 0.5);
+}
+#upp {
+    background-color: rgba(255, 255, 0, 0.5);
+}
+#del {
+    background-color: rgba(255, 0, 0, 0.5);
+} */

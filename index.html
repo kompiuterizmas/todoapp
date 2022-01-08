@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>ToDoList</title>
+  </head>
+  <body>
+    <div class="row">
+      <div class="twothird border col">
+        <div class="center">Month view</div>
+        <div data-app="calendar-app"></div>
+      </div>
+      <div class="onethird border col">
+        <div class="center">Task details</div>
+        <div class="center full">
+          <table>
+            <tr>
+              <th>Title</th>
+              <td>pavadinimas</td>
+            </tr>
+            <tr>
+              <th>Date</th>
+              <td>data</td>
+            </tr>
+            <tr>
+              <th>Start time</th>
+              <td>pradžia</td>
+            </tr>
+            <tr>
+              <th>End time</th>
+              <td>pabaiga</td>
+            </tr>
+            <tr>
+              <th>Type</th>
+              <td>tipas</td>
+            </tr>
+            <tr>
+              <th>Description</th>
+              <td>aprašymas</td>
+            </tr>
+            <tr></tr>
+          </table>
+        </div>
+        <div class="full even">
+          <button id="add">Add task</button>
+          <button id="upp">Update task</button>
+          <button id="del">Delete task</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
