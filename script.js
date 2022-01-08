@@ -3,7 +3,7 @@ let clicked = null;
 let events = localStorage.getItem("events")
   ? JSON.parse(localStorage.getItem("events"))
   : [];
-let autoId = 0;
+let storeId = 0;
 
 const calendar = document.getElementById("calendar");
 const newEvent = document.getElementById("newEvent");
@@ -23,19 +23,28 @@ const weekdays = [
   "Sunday",
 ];
 
+function getEvent(id){
+  currentEvent = events.filter(e => {return e.id === id});
+  storeId = currentEvent[0].id;
+  // console.log('reikia sito '+storeId);
+return currentEvent;
+}
+
 function initForm(date) {
   clicked = date;
     eventDateInput.value = clicked;
 }
 
 function editForm(id){
-  const event = events.find((e) => e.id === id);
-  eventTitleInput.value = event.title;
-  eventDateInput.value = event.date;
-  eventStartInput.value = event.start;
-  eventEndInput.value = event.end;
-  eventTypeInput.value = event.type;
-  eventDescriptionInput.value = event.description;
+  currentEvent = getEvent(id);
+  storeId = id;
+
+  eventTitleInput.value = currentEvent[0].title;
+  eventDateInput.value = currentEvent[0].date;
+  eventStartInput.value = currentEvent[0].start;
+  eventEndInput.value = currentEvent[0].end;
+  eventTypeInput.value = currentEvent[0].type;
+  eventDescriptionInput.value = currentEvent[0].description;
 }
 
 function load() {
@@ -58,6 +67,7 @@ function load() {
     month: "numeric",
     day: "numeric",
   });
+
   const paddingDays = weekdays.indexOf(dateString.split(", ")[0]);
 
   document.getElementById("monthDisplay").innerText = `${dt.toLocaleDateString(
@@ -76,14 +86,14 @@ function load() {
     if (i > paddingDays) {
       daySquare.innerText = i - paddingDays;
 
-      const eventForDay = events.filter(e => {return e.date === dayString});
+      const eventsForDay = events.filter(e => {return e.date === dayString});
 
       if (i - paddingDays === day && nav === 0) {
         daySquare.id = "currentDay";
       }
 
-      if (eventForDay.length > 0){
-      eventForDay.forEach(e => {
+      if (eventsForDay.length > 0){
+      eventsForDay.forEach(e => {
         const eventDiv = document.createElement("div");
         eventDiv.addEventListener("click", () => editForm(e.id));
         if (e.type === 'meeting'){
@@ -175,7 +185,7 @@ function createEvent() {
     )
   ) {
     events.push({
-      id: (autoId + autoId++),
+      id: Date.now(),
       date: clicked,
       title: eventTitleInput.value,
       date: eventDateInput.value,
@@ -200,20 +210,22 @@ function updateEvent() {
       eventEndInput.value,
       eventTypeInput.value
     )
-  ) (events[0].date = clicked),
-      (events[0].title = eventTitleInput.value),
-      (events[0].start = eventStartInput.value),
-      (events[0].end = eventEndInput.value),
-      (events[0].type = eventTypeInput.value),
-      (events[0].description = eventDescriptionInput.value),
+  ) 
+  currentEvent = getEvent(storeId);
+      (currentEvent[0].date = clicked),
+      (currentEvent[0].title = eventTitleInput.value),
+      (currentEvent[0].start = eventStartInput.value),
+      (currentEvent[0].end = eventEndInput.value),
+      (currentEvent[0].type = eventTypeInput.value),
+      (currentEvent[0].description = eventDescriptionInput.value),
       localStorage.setItem("events", JSON.stringify(events));
 
     clearForm();
 }
 
 function deleteEvent() {
-  events = events.filter((e) => e.date !== clicked);
-  localStorage.setItem("events", JSON.stringify(events));
+  events = events.filter(e => e.id !== storeId)
+  localStorage.setItem('events', JSON.stringify(events));
   clearForm();
 }
 
@@ -234,7 +246,7 @@ function initButtons() {
 
   document.getElementById("deleteButton").addEventListener("click", deleteEvent);
 
-  document.getElementById("cancelButton").addEventListener("click", clearForm);  
+  document.getElementById("cancelButton").addEventListener("click", clearForm);
 }
 
 initButtons();
