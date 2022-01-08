@@ -1,125 +1,241 @@
-// Months array
-var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-// Days of the Week
-var daysOfWeek = ['S','M','T','W','TH','F','SA'];
-var gridsize = 42; //Total number of date boxes in the grid
+let nav = 0;
+let clicked = null;
+let events = localStorage.getItem("events")
+  ? JSON.parse(localStorage.getItem("events"))
+  : [];
+let autoId = 0;
 
-// Default the state to current month and year.
-var state = {
-  month: new Date().getMonth(),
-  year: new Date().getFullYear(),
+const calendar = document.getElementById("calendar");
+const newEvent = document.getElementById("newEvent");
+const eventTitleInput = document.getElementById("eventTitleInput");
+const eventDateInput = document.getElementById("eventDateInput");
+const eventStartInput = document.getElementById("eventStartInput");
+const eventEndInput = document.getElementById("eventEndInput");
+const eventTypeInput = document.getElementById("eventTypeInput");
+const eventDescriptionInput = document.getElementById("eventDescriptionInput");
+const weekdays = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+
+function initForm(date) {
+  clicked = date;
+    eventDateInput.value = clicked;
 }
 
-// The following function builds an array of objects with dates to be displayed in the grid
-function datesForGrid(year, month) {
-  // days array holds all the days to be populated in the grid
-  var dates = [];
-  // Day on which the month starts
-  var firstDay = new Date(year, month).getDay(); 
-  // Total number of days in the month
-  var totalDaysInMonth = new Date(year, month + 1, 0).getDate();
-  // Total number of days in the previous month
-  var totalDaysInPrevMonth = new Date(year, month, 0).getDate();
-  
-  // Days from prev month to show in the grid
-  for(var i = 1; i <= firstDay; i++) {
-    var prevMonthDate = totalDaysInPrevMonth - firstDay + i;
-    var key = new Date(state.year, state.month -1, prevMonthDate).toLocaleString();    
-    dates.push({key: key, date: prevMonthDate, monthClass:'prev'});
+function editForm(id){
+  const event = events.find((e) => e.id === id);
+  eventTitleInput.value = event.title;
+  eventDateInput.value = event.date;
+  eventStartInput.value = event.start;
+  eventEndInput.value = event.end;
+  eventTypeInput.value = event.type;
+  eventDescriptionInput.value = event.description;
+}
+
+function load() {
+  const dt = new Date();
+
+  if (nav !== 0) {
+    dt.setMonth(new Date().getMonth() + nav);
   }
-  // Days of the current month to show in the grid
-  var today = new Date();
-  for(var i = 1; i <= totalDaysInMonth; i++) {
-    var key = new Date(state.year, state.month, i).toLocaleString();
-    if(i === today.getDate() && state.month === today.getMonth() && state.year === today.getFullYear()) {
-      dates.push({key: key, date: i, monthClass: 'current', todayClass: 'today'})
-    } else{ 
-      dates.push({key: key, date: i, monthClass: 'current'});
+
+  const day = dt.getDate();
+  const month = dt.getMonth();
+  const year = dt.getFullYear();
+
+  const firstDayOfMonth = new Date(year, month, 1);
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const dateString = firstDayOfMonth.toLocaleDateString("en-us", {
+    weekday: "long",
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  });
+  const paddingDays = weekdays.indexOf(dateString.split(", ")[0]);
+
+  document.getElementById("monthDisplay").innerText = `${dt.toLocaleDateString(
+    "en-us",
+    { month: "long" }
+  )} ${year}`;
+
+  calendar.innerHTML = "";
+
+  for (let i = 1; i <= paddingDays + daysInMonth; i++) {
+    const daySquare = document.createElement("div");
+    daySquare.classList.add("day");
+
+    const dayString = `${month + 1}/${i - paddingDays}/${year}`;
+
+    if (i > paddingDays) {
+      daySquare.innerText = i - paddingDays;
+
+      const eventForDay = events.filter(e => {return e.date === dayString});
+
+      if (i - paddingDays === day && nav === 0) {
+        daySquare.id = "currentDay";
+      }
+
+      if (eventForDay.length > 0){
+      eventForDay.forEach(e => {
+        const eventDiv = document.createElement("div");
+        eventDiv.addEventListener("click", () => editForm(e.id));
+        if (e.type === 'meeting'){
+          eventDiv.classList.add("event", "green");
+        }else
+        if (e.type === 'call'){
+          eventDiv.classList.add("event", "yello");
+        }else
+        if (e.type === 'out of office'){
+          eventDiv.classList.add("event", "red");
+        }
+        eventDiv.innerText = e.title;
+        daySquare.appendChild(eventDiv);
+      });
+        
+      }
+
+      daySquare.addEventListener("click", () => initForm(dayString));
+    } else {
+      daySquare.classList.add("padding");
     }
+    calendar.appendChild(daySquare);
   }
-  
-  // If there is space left over in the grid, then show the dates for the next month
-  if(dates.length < gridsize) {
-    var count = gridsize - dates.length;
-    for(var i = 1; i <= count; i++) {
-      var key = new Date(state.year, state.month + 1, i).toLocaleString();
-      dates.push({key: key, date: i, monthClass:'next'});
-    }
-  }
-  return dates;
 }
 
-function render() {  
-  var calendarApp = document.querySelector('[data-app=calendar-app]');
-  // Building the calendar app HTML from the data
-  calendarApp.innerHTML = `
-      <div class="calendar-nav">
-        <button id="prev-month">Previous</button>
-        <h2>${months[state.month]} ${state.year}</h2>
-        <button id="next-month">Next</button>
-      </div>
-      <div class='calendar-grid'>
-        ${ daysOfWeek.map(day => `<div>${day}</div>` ).join('') }
-        ${ datesForGrid(state.year, state.month).map(date => `<div id="${date.key}" class="${date.monthClass} ${date.todayClass ? date.todayClass : ''}">${date.date}</div>`).join('') }
-      </div>
-  `;
+function validate(a, b, c, d, e) {
+  if (a && a.length < 50) {
+    eventTitleInput.classList.remove("error");
+    return a;
+  } else {
+    eventTitleInput.classList.add("error");
+    window.alert("Please enter task title! It must be shorter than 50 symbols");
+  }
+  if (b) {
+    eventDateInput.classList.remove("error");
+    return b;
+  } else {
+    eventDateInput.classList.add("error");
+    window.alert("Please select day in calendar!");
+  }
+  if (c) {
+    eventStartInput.classList.remove("error");
+    return c;
+  } else {
+    eventStartInput.classList.add("error");
+    window.alert("Please enter start time!");
+  }
+  if (d && d > c) {
+    eventEndInput.classList.remove("error");
+    return d;
+  } else {
+    eventEndInput.classList.add("error");
+    window.alert(
+      "Please enter end time! It can not be earlier then start time."
+    );
+  }
+  if (e) {
+    eventTypeInput.classList.remove("error");
+  } else {
+    eventTypeInput.classList.add("error");
+    window.alert("Please select event type!");
+  }
 }
 
-function showCalendar(prevNextIndicator) {
-  var date = new Date(state.year, state.month + prevNextIndicator);
-  //Update the state
-  state.year = date.getFullYear();
-  state.month = date.getMonth();  
-  render();
+function clearForm() {
+  eventTitleInput.classList.remove("error");
+  eventDateInput.classList.remove("error");
+  eventStartInput.classList.remove("error");
+  eventEndInput.classList.remove("error");
+  eventTypeInput.classList.remove("error");
+  eventTitleInput.value = "";
+  eventDateInput.value = "";
+  eventStartInput.value = "";
+  eventEndInput.value = "";
+  eventTypeInput.value = "";
+  eventDescriptionInput.value = "";
+  clicked = null;
+  load();
 }
 
-// Show the current month by default
-showCalendar(0);
+function createEvent() {
+  if (
+    validate(
+      eventTitleInput.value,
+      eventDateInput.value,
+      eventStartInput.value,
+      eventEndInput.value,
+      eventTypeInput.value
+    )
+  ) {
+    events.push({
+      id: (autoId + autoId++),
+      date: clicked,
+      title: eventTitleInput.value,
+      date: eventDateInput.value,
+      start: eventStartInput.value,
+      end: eventEndInput.value,
+      type: eventTypeInput.value,
+      description: eventDescriptionInput.value,
+    });
 
-document.addEventListener('click', function(ev) {
-  if(ev.target.id === 'prev-month') {
-    showCalendar(-1);
+    localStorage.setItem("events", JSON.stringify(events));
+
+    clearForm();
   }
-  if(ev.target.id === 'next-month') {
-    showCalendar(1);
-  }
-});
+}
 
+function updateEvent() {
+  if (
+    validate(
+      eventTitleInput.value,
+      eventDateInput.value,
+      eventStartInput.value,
+      eventEndInput.value,
+      eventTypeInput.value
+    )
+  ) (events[0].date = clicked),
+      (events[0].title = eventTitleInput.value),
+      (events[0].start = eventStartInput.value),
+      (events[0].end = eventEndInput.value),
+      (events[0].type = eventTypeInput.value),
+      (events[0].description = eventDescriptionInput.value),
+      localStorage.setItem("events", JSON.stringify(events));
 
+    clearForm();
+}
 
-// var today = new Date();
-// console.log(today);
-// var weekDay = today.toString().split(' ')[0];
-// var dd = String(today.getDate()).padStart(2, '0');
-// var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-// var yyyy = today.getFullYear();
+function deleteEvent() {
+  events = events.filter((e) => e.date !== clicked);
+  localStorage.setItem("events", JSON.stringify(events));
+  clearForm();
+}
 
+function initButtons() {
+  document.getElementById("nextButton").addEventListener("click", () => {
+    nav++;
+    load();
+  });
 
-// today = mm + '/' + dd + '/' + yyyy;
+  document.getElementById("backButton").addEventListener("click", () => {
+    nav--;
+    load();
+  });
 
+  document.getElementById("createButton").addEventListener("click", createEvent);
 
-// function daysOfMonth(){
-//     var calendar= "";
-//     var rows= 6;
-//     var cols=6;
-//     var c= 1;
-//     var daysMonth =31;
-//     for(var r=0; r<rows; r++){
-//       calendar+= "<tr>";
-//           for(var i=0; i<=cols; i++){
-//           if(c<=daysMonth){
-//               calendar+= "<td>" + c +"</td>";
-//           }else{
-//           break;
-//           }
-            
-//             c++;
-//         // each col should display number at i
-//       }
-      
-  
-//   calendar+= "</tr>";
-//    }
-//    document.getElementById('calendar').innerHTML = calendar;
-//   };
-//     daysOfMonth();
+  document.getElementById("updateButton").addEventListener("click", updateEvent);
+
+  document.getElementById("deleteButton").addEventListener("click", deleteEvent);
+
+  document.getElementById("cancelButton").addEventListener("click", clearForm);  
+}
+
+initButtons();
+load();

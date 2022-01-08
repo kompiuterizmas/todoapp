@@ -6,52 +6,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
     <title>ToDoList</title>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <div class="row">
-      <div class="twothird border col">
-        <div class="center">Month view</div>
-        <div data-app="calendar-app"></div>
-      </div>
-      <div class="onethird border col">
-        <div class="center">Task details</div>
-        <div class="center full">
-          <table>
-            <tr>
-              <th>Title</th>
-              <td>pavadinimas</td>
-            </tr>
-            <tr>
-              <th>Date</th>
-              <td>data</td>
-            </tr>
-            <tr>
-              <th>Start time</th>
-              <td>pradžia</td>
-            </tr>
-            <tr>
-              <th>End time</th>
-              <td>pabaiga</td>
-            </tr>
-            <tr>
-              <th>Type</th>
-              <td>tipas</td>
-            </tr>
-            <tr>
-              <th>Description</th>
-              <td>aprašymas</td>
-            </tr>
-            <tr></tr>
-          </table>
+      <div id="container">
+        <div id="header">
+          <div id="monthDisplay"></div>
+          <div class="row even width200">
+            <button id="backButton">Back</button>
+            <button id="nextButton">Next</button>
+          </div>
         </div>
-        <div class="full even">
-          <button id="add">Add task</button>
-          <button id="upp">Update task</button>
-          <button id="del">Delete task</button>
+
+        <div id="weekdays">
+          <div>Monday</div>
+          <div>Tuesday</div>
+          <div>Wednesday</div>
+          <div>Thursday</div>
+          <div>Friday</div>
+          <div>Saturday</div>
+          <div>Sunday</div>
+        </div>
+        <div id="calendar"></div>
+      </div>
+
+      <div id="newEvent">
+        <h2>Event</h2>
+
+        <input
+          id="eventTitleInput"
+          class="formField"
+          placeholder="Event Title"
+        />
+        <input
+          id="eventDateInput"
+          class="formField"
+          placeholder="Event date"
+        />
+        <input
+          id="eventStartInput"
+          class="formField"
+          placeholder="Start time"
+        />
+        <input id="eventEndInput" class="formField" placeholder="End time" />
+        <label for="eventTypeInput"><h3>Select type:</h3></label>
+        <select
+          id="eventTypeInput"
+          name="eventTypeInput"
+          class="formField"
+          form="eventTypeInput"
+        >
+          <option class="green" value="meeting">Meeting</option>
+          <option class="yello" value="call">Call</option>
+          <option class="red" value="out of office">Out of office</option>
+        </select>
+        <input
+          type="text"
+          id="eventDescriptionInput"
+          class="formField"
+          placeholder="Description"
+        />
+        <div class="row even">
+          <button id="createButton">Create</button>
+          <button id="updateButton">Update</button>
+          <button id="deleteButton">Delete</button>
+          <button id="cancelButton">Cancel</button>
         </div>
       </div>
     </div>
-
-    <script src="script.js"></script>
+    <script src="./script.js"></script>
   </body>
 </html>
